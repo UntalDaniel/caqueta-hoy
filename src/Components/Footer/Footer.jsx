@@ -1,6 +1,4 @@
 import React from 'react'
-import { Box, Container, Typography } from '@mui/material'
-import { Link } from 'react-router-dom'
 import './Footer.css'
 import { useState } from 'react'
 import { crearDocumento, subirArchivo } from '../../servicios/firebase'
@@ -26,7 +24,6 @@ export default function Footer() {
           const ruta = `anonimas/${Date.now()}_${archivo.name}`
           evidenciaUrl = await subirArchivo(ruta, archivo)
         } catch (err) {
-          // Si las reglas de Storage no permiten anónimo, continuamos sin evidencia
           setMensaje('No se pudo subir la evidencia. Se enviará solo el texto.')
         }
       }
@@ -46,24 +43,26 @@ export default function Footer() {
   }
 
   return (
-    <Box component="footer" className="footer">
-      <Container className="footer-container">
-        <Box className="footer-brand">
-          <Typography variant="h6">Caquetá Hoy</Typography>
-          <Typography variant="body2">Noticias del departamento</Typography>
-          <Typography variant="body2">Hecho con React + Firebase</Typography>
-        </Box>
-        <Box className="footer-social">
-          <Typography variant="subtitle2">Síguenos</Typography>
+    <footer className="footer">
+      <div className="footer-container">
+        <div className="footer-brand">
+          <h2 style={{ margin: 0, fontSize: 18 }}>Caquetá Hoy</h2>
+          <p style={{ margin: 0 }}>Noticias del departamento</p>
+          <small style={{ opacity: .9 }}>Hecho con React + Firebase</small>
+        </div>
+        <div className="footer-social">
+          <p style={{ margin: 0, fontWeight: 600 }}>Síguenos</p>
           <div className="social-links">
-            <a href="https://www.facebook.com/" target="_blank" rel="noreferrer">Facebook</a>
-            <a href="https://www.instagram.com/" target="_blank" rel="noreferrer">Instagram</a>
-            <a href="https://x.com/" target="_blank" rel="noreferrer">X</a>
+            <a href="https://www.facebook.com/" target="_blank" rel="noreferrer" aria-label="Facebook" title="Facebook">📘 Facebook</a>
+            <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" aria-label="Instagram" title="Instagram">📸 Instagram</a>
+            <a href="https://x.com/" target="_blank" rel="noreferrer" aria-label="X" title="X">𝕏 X</a>
           </div>
-          <Typography variant="caption">Contacto: contacto@caquetahoy.com</Typography>
-        </Box>
-        <Box className="footer-anon">
-          <Typography variant="subtitle2">Enviar noticia anónima</Typography>
+          <small>
+            📧 Contacto: <a href="mailto:contacto@caquetahoy.com" style={{ color: '#fff', textDecoration: 'underline' }}>contacto@caquetahoy.com</a>
+          </small>
+        </div>
+        <div className="footer-anon">
+          <p style={{ margin: 0, fontWeight: 600 }}>Enviar noticia anónima</p>
           <form onSubmit={manejarEnviar} className="anon-form">
             <textarea
               placeholder="Cuéntanos lo que sabes..."
@@ -80,15 +79,16 @@ export default function Footer() {
             </div>
             {mensaje && <p className="anon-msg">{mensaje}</p>}
           </form>
-        </Box>
-      </Container>
-      <Box className="footer-bottom">
-        <Container className="footer-bottom-inner">
-          <Typography variant="caption"> {new Date().getFullYear()} Caquetá Hoy</Typography>
-          <Typography variant="caption">Todos los derechos reservados</Typography>
-        </Container>
-      </Box>
-    </Box>
+        </div>
+      </div>
+      <div className="footer-bottom">
+        <div className="footer-bottom-inner">
+          <small> {new Date().getFullYear()} Caquetá Hoy</small>
+          <small>Todos los derechos reservados</small>
+        </div>
+      </div>
+    </footer>
   )
 }
+
 

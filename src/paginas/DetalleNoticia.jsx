@@ -28,17 +28,17 @@ export default function DetalleNoticia() {
   if (noticia.estado !== 'publicado') return <p>Esta noticia no está publicada.</p>
 
   return (
-    <article>
-      <p><Link to="/">Volver</Link></p>
-      <h1>{noticia.titulo}</h1>
-      {noticia.subtitulo && <h3>{noticia.subtitulo}</h3>}
+    <article className="contenedor-medio">
+      <p className="mb-2"><Link to="/">Volver</Link></p>
+      <h1 className="mt-0 mb-2">{noticia.titulo}</h1>
+      {noticia.subtitulo && <h3 className="mt-0 mb-2">{noticia.subtitulo}</h3>}
       {noticia.imagenUrl && (
-        <div style={{ margin: '16px 0' }}>
-          <img src={noticia.imagenUrl} alt={noticia.titulo} style={{ maxWidth: '100%', height: 'auto' }} />
+        <div className="mt-2 mb-2">
+          <img src={noticia.imagenUrl} alt={noticia.titulo} className="img-responsiva" />
         </div>
       )}
-      <p style={{ whiteSpace: 'pre-wrap' }}>{noticia.contenido}</p>
-      <p style={{ color: '#555' }}>
+      <p className="pre-wrap">{noticia.contenido}</p>
+      <p className="texto-secundario texto-pequenio mt-2">
         Por {noticia.autorNombre} · {noticia.fechaCreacion?.seconds ? new Date(noticia.fechaCreacion.seconds * 1000).toLocaleString() : ''}
       </p>
     </article>

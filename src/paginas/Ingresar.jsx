@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 export default function Ingresar() {
   const { ingresar, registrar, error, usuarioActual } = useUsuario()
   const navegar = useNavigate()
-  const [modo, setModo] = useState('login') // 'login' | 'registro'
+  const [modo, setModo] = useState('login')
   const [nombre, setNombre] = useState('')
   const [correo, setCorreo] = useState('')
   const [contrasena, setContrasena] = useState('')
@@ -26,11 +26,11 @@ export default function Ingresar() {
   }, [usuarioActual, navegar])
 
   return (
-    <div style={{ maxWidth: 420 }}>
-      <h1>{modo === 'login' ? 'Ingresar' : 'Crear cuenta'}</h1>
-      <form onSubmit={manejarEnviar}>
+    <div className="contenedor-pequenio">
+      <h1 className="mt-0">{modo === 'login' ? 'Ingresar' : 'Crear cuenta'}</h1>
+      <form onSubmit={manejarEnviar} className="form-grid">
         {modo === 'registro' && (
-          <div style={{ marginBottom: 12 }}>
+          <div className="mb-3">
             <label>Nombre</label>
             <input
               type="text"
@@ -38,11 +38,11 @@ export default function Ingresar() {
               onChange={(e) => setNombre(e.target.value)}
               required
               placeholder="Tu nombre"
-              style={{ width: '100%', padding: 8 }}
+              className="w-100"
             />
           </div>
         )}
-        <div style={{ marginBottom: 12 }}>
+        <div className="mb-3">
           <label>Correo</label>
           <input
             type="email"
@@ -50,10 +50,10 @@ export default function Ingresar() {
             onChange={(e) => setCorreo(e.target.value)}
             required
             placeholder="tu@correo.com"
-            style={{ width: '100%', padding: 8 }}
+            className="w-100"
           />
         </div>
-        <div style={{ marginBottom: 12 }}>
+        <div className="mb-3">
           <label>Contraseña</label>
           <input
             type="password"
@@ -61,15 +61,17 @@ export default function Ingresar() {
             onChange={(e) => setContrasena(e.target.value)}
             required
             minLength={6}
-            style={{ width: '100%', padding: 8 }}
+            className="w-100"
           />
         </div>
         {error && <p style={{ color: 'crimson' }}>{error}</p>}
-        <button type="submit" style={{ padding: '8px 12px' }}>
-          {modo === 'login' ? 'Ingresar' : 'Registrarme'}
-        </button>
+        <div className="acciones-linea">
+          <button type="submit">
+            {modo === 'login' ? 'Ingresar' : 'Registrarme'}
+          </button>
+        </div>
       </form>
-      <div style={{ marginTop: 12 }}>
+      <div className="mt-3">
         {modo === 'login' ? (
           <button onClick={() => setModo('registro')}>Crear una cuenta</button>
         ) : (
@@ -79,3 +81,4 @@ export default function Ingresar() {
     </div>
   )
 }
+

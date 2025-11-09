@@ -4,3 +4,12 @@
 .header .barra-navegacion{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
 .header a,.header .boton-nav{color:inherit;text-decoration:none}
 .header .titulo-sitio{font-weight:700}
+
+/* Estilos de la franja superior (banner) */
+.header .banner{
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  background: linear-gradient(90deg, #166534, #1D4ED8);
+}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { listarDocumentos, eliminarDocumento, actualizarDocumento } from '../servicios/firebase'
 import { useUsuario } from '../contexto/UsuarioContexto'
-import { Grid, Card, CardContent, CardActions, Button, Chip } from '@mui/material'
+import { Button, Chip } from '@mui/material'
 import { ROLES, ESTADOS_NOTICIA } from '../servicios/modelos'
 
 export default function NoticiasLista() {
@@ -57,58 +57,56 @@ export default function NoticiasLista() {
   return (
     <div>
       <h1>Noticias</h1>
-      <div style={{ marginBottom: 12 }}>
+      <div className="mb-3">
         <Button variant="contained" onClick={() => navegar('/panel/noticias/nueva')}>Nueva noticia</Button>
       </div>
       {error && <p style={{ color: 'crimson' }}>{error}</p>}
       {noticias.length === 0 ? (
         <p>No hay noticias</p>
       ) : (
-        <Grid container spacing={2}>
+        <div className="grid-tarjetas">
           {noticias.map((n) => (
-            <Grid key={n.id} size={{ xs: 12, sm: 6, md: 4 }}>
-              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Chip label={n.estado} size="small" sx={{ mb: 1 }} color={n.estado === 'publicado' ? 'success' : n.estado === 'desactivado' ? 'default' : 'warning'} />
-                  <h3 style={{ margin: '4px 0 8px' }}>{n.titulo}</h3>
-                  {n.subtitulo && <p style={{ margin: 0, color: '#4B5563' }}>{n.subtitulo}</p>}
-                  <p style={{ marginTop: 8, fontSize: 12, color: '#6B7280' }}>
-                    {`Por ${n.autorNombre || n.autorUid || 'Autor desconocido'}`}
-                  </p>
-                  <p style={{ marginTop: 8, fontSize: 12, color: '#6B7280' }}>
-                    {n.fechaCreacion?.seconds ? new Date(n.fechaCreacion.seconds * 1000).toLocaleString() : ''}
-                  </p>
-                </CardContent>
-                <CardActions>
-                  <Button size="small" onClick={() => navegar(`/panel/noticias/${n.id}`)}>Editar</Button>
-                  {/* Acciones de estado para editores/administradores */}
-                  {(rol === ROLES.editor || rol === ROLES.administrador) && (
-                    <>
-                      {n.estado !== ESTADOS_NOTICIA.publicado && (
-                        <Button size="small" color="success" onClick={() => cambiarEstado(n, ESTADOS_NOTICIA.publicado)}>Publicar</Button>
-                      )}
-                      {n.estado === ESTADOS_NOTICIA.publicado && (
-                        <Button size="small" onClick={() => cambiarEstado(n, ESTADOS_NOTICIA.desactivado)}>Desactivar</Button>
-                      )}
-                      {n.estado === ESTADOS_NOTICIA.edicion && (
-                        <Button size="small" onClick={() => cambiarEstado(n, ESTADOS_NOTICIA.terminado)}>Marcar terminado</Button>
-                      )}
-                    </>
-                  )}
-                  <Button
-                    size="small"
-                    color="error"
-                    onClick={() => manejarEliminar(n.id)}
-                    disabled={n.estado === ESTADOS_NOTICIA.publicado && !(rol === ROLES.editor || rol === ROLES.administrador)}
-                  >
-                    Eliminar
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
+            <div key={n.id} className="tarjeta" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div style={{ flexGrow: 1 }}>
+                <Chip label={n.estado} size="small" sx={{ mb: 1 }} color={n.estado === 'publicado' ? 'success' : n.estado === 'desactivado' ? 'default' : 'warning'} />
+                <h3 className="mt-1 mb-2">{n.titulo}</h3>
+                {n.subtitulo && <p className="m-0 texto-secundario">{n.subtitulo}</p>}
+                <p className="mt-2 texto-pequenio texto-secundario">
+                  {`Por ${n.autorNombre || n.autorUid || 'Autor desconocido'}`}
+                </p>
+                <p className="mt-2 texto-pequenio texto-secundario">
+                  {n.fechaCreacion?.seconds ? new Date(n.fechaCreacion.seconds * 1000).toLocaleString() : ''}
+                </p>
+              </div>
+              <div className="acciones-linea">
+                <Button size="small" onClick={() => navegar(`/panel/noticias/${n.id}`)}>Editar</Button>
+                {(rol === ROLES.editor || rol === ROLES.administrador) && (
+                  <>
+                    {n.estado !== ESTADOS_NOTICIA.publicado && (
+                      <Button size="small" color="success" onClick={() => cambiarEstado(n, ESTADOS_NOTICIA.publicado)}>Publicar</Button>
+                    )}
+                    {n.estado === ESTADOS_NOTICIA.publicado && (
+                      <Button size="small" onClick={() => cambiarEstado(n, ESTADOS_NOTICIA.desactivado)}>Desactivar</Button>
+                    )}
+                    {n.estado === ESTADOS_NOTICIA.edicion && (
+                      <Button size="small" onClick={() => cambiarEstado(n, ESTADOS_NOTICIA.terminado)}>Marcar terminado</Button>
+                    )}
+                  </>
+                )}
+                <Button
+                  size="small"
+                  color="error"
+                  onClick={() => manejarEliminar(n.id)}
+                  disabled={n.estado === ESTADOS_NOTICIA.publicado && !(rol === ROLES.editor || rol === ROLES.administrador)}
+                >
+                  Eliminar
+                </Button>
+              </div>
+            </div>
           ))}
-        </Grid>
+        </div>
       )}
     </div>
   )
 }
+

@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import { Paper, Stack, Typography, Button } from '@mui/material'
+import { Button } from '@mui/material'
 import { listarAnonimas } from '../servicios/firebase'
 import { useNavigate } from 'react-router-dom'
 
 export default function AnonimasAceptadas() {
-  const [items, setItems] = useState([])
+  const [denuncias, setDenuncias] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [cursor, setCursor] = useState(null)
   const navegar = useNavigate()
 
-  async function cargar(mas = false) {
+  async function cargarDenunciasAceptadas(mas = false) {
     try {
       const { items: nuevos, cursor: c } = await listarAnonimas({ estado: 'aceptado', tam: 10, cursor: mas ? cursor : null })
-      setItems((prev) => (mas ? [...prev, ...nuevos] : nuevos))
+      setDenuncias((prev) => (mas ? [...prev, ...nuevos] : nuevos))
       setCursor(c)
     } catch (e) {
       setError('No se pudieron cargar las denuncias aceptadas. Verifica las reglas de Firestore.')
@@ -23,8 +23,7 @@ export default function AnonimasAceptadas() {
   }
 
   useEffect(() => {
-    cargar(false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    cargarDenunciasAceptadas(false)
   }, [])
 
   function desarrollar(item) {
@@ -39,35 +38,38 @@ export default function AnonimasAceptadas() {
   }
 
   return (
-    <Paper sx={{ p: 2 }}>
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-        <Typography variant="h5">Anónimas aceptadas</Typography>
-        <Button onClick={() => cargar(false)}>Refrescar</Button>
-      </Stack>
+    <div className="bloque">
+      <div className="fila mb-3">
+        <h1 className="m-0" style={{ fontSize: 20 }}>Anónimas aceptadas</h1>
+        <Button onClick={() => cargarDenunciasAceptadas(false)}>Refrescar</Button>
+      </div>
 
-      {cargando && <Typography>Cargando...</Typography>}
-      {error && <Typography color="error">{error}</Typography>}
+      {cargando && <p className="mt-2">Cargando...</p>}
+      {error && <p style={{ color: 'crimson' }}>{error}</p>}
 
-      <Stack spacing={2}>
-        {items.map((it) => (
-          <Paper key={it.id} sx={{ p: 2 }} variant="outlined">
-            <Stack spacing={1}>
-              <Typography variant="subtitle2">ID: {it.id}</Typography>
+      <div className="grid-tarjetas">
+        {denuncias.map((it) => (
+          <div key={it.id} className="tarjeta">
+            <div className="bloque">
+              <p className="m-0 texto-pequenio texto-secundario">ID: {it.id}</p>
               {it.evidenciaUrl && (
-                <img src={it.evidenciaUrl} alt="evidencia" style={{ maxWidth: 300 }} />
+                <img src={it.evidenciaUrl} alt="evidencia" className="img-max-300" />
               )}
-              <Typography whiteSpace="pre-wrap">{it.texto}</Typography>
-              <Stack direction="row" spacing={1}>
+              <p style={{ whiteSpace: 'pre-wrap' }} className="m-0">{it.texto}</p>
+              <div className="acciones-linea">
                 <Button size="small" variant="contained" onClick={() => desarrollar(it)}>Desarrollar</Button>
-              </Stack>
-            </Stack>
-          </Paper>
+              </div>
+            </div>
+          </div>
         ))}
-      </Stack>
+      </div>
 
       {cursor && (
-        <Button sx={{ mt: 2 }} variant="outlined" onClick={() => cargar(true)}>Cargar más</Button>
+        <div className="mt-3">
+          <Button variant="outlined" onClick={() => cargarDenunciasAceptadas(true)}>Cargar más</Button>
+        </div>
       )}
-    </Paper>
+    </div>
   )
 }
+

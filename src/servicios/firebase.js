@@ -1,4 +1,3 @@
-// Servicio de Firebase (variables en español)
 import { initializeApp } from 'firebase/app'
 import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { getFirestore, collection, doc, addDoc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, serverTimestamp, query, where, orderBy, limit, startAfter } from 'firebase/firestore'
@@ -38,13 +37,11 @@ export async function cerrarSesion() {
   await signOut(auth)
 }
 
-// Auth con correo/contraseña
 export async function registrarConCorreo({ nombre, correo, contrasena, rol = 'reportero' }) {
   const cred = await createUserWithEmailAndPassword(auth, correo, contrasena)
   if (nombre) {
     await updateProfile(cred.user, { displayName: nombre })
   }
-  // Crear documento de usuario con rol
   await setDoc(doc(db, 'usuarios', cred.user.uid), {
     uid: cred.user.uid,
     nombre: nombre || '',
@@ -68,7 +65,6 @@ export async function obtenerRolUsuario(uid) {
   return 'reportero'
 }
 
-// Helpers Firestore (colecciones en español)
 export async function crearDocumento(nombreColeccion, datos) {
   const colRef = collection(db, nombreColeccion)
   const docRef = await addDoc(colRef, {
@@ -101,7 +97,6 @@ export async function eliminarDocumento(nombreColeccion, id) {
   await deleteDoc(docRef)
 }
 
-// Helpers Storage
 export async function subirArchivo(rutaDestino, archivo) {
   const archivoRef = ref(storage, rutaDestino)
   await uploadBytes(archivoRef, archivo)
@@ -109,7 +104,6 @@ export async function subirArchivo(rutaDestino, archivo) {
   return url
 }
 
-// Queries específicas
 export async function listarNoticiasPublicadas({ seccionId, municipio, tam = 9, cursor = null } = {}) {
   const colRef = collection(db, 'noticias')
   const filtros = [where('estado', '==', 'publicado')]
@@ -121,4 +115,11 @@ export async function listarNoticiasPublicadas({ seccionId, municipio, tam = 9, 
   const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
   const ultimo = snap.docs[snap.docs.length - 1] || null
   return { items, cursor: ultimo }
+}
+
+export async function listarNoticiasPorAutor(uid) {
+  const colRef = collection(db, 'noticias')
+  const q = query(colRef, where('autorUid', '==', uid))
+  const snap = await getDocs(q)
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }))
 }

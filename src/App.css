@@ -1,0 +1,11 @@
+/* Estilos específicos de la aplicación */
+
+.contenedor-principal {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.area-principal {
+  padding: 12px 0;
+}

@@ -1,169 +1,165 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { listarDocumentos, listarNoticiasPublicadas } from '../servicios/firebase'
-import { Grid, Card, CardContent, CardMedia, Chip, Box, Select, MenuItem, Button, Skeleton } from '@mui/material'
-import { useUsuario } from '../contexto/UsuarioContexto'
+import { Chip, Button } from '@mui/material'
 
 export default function Inicio() {
-  const { usuarioActual, salir } = useUsuario()
   const [secciones, setSecciones] = useState([])
   const [noticias, setNoticias] = useState([])
-  const [cursor, setCursor] = useState(null)
-  const [cargandoMas, setCargandoMas] = useState(false)
   const [estaCargando, setEstaCargando] = useState(true)
   const [error, setError] = useState(null)
   const [municipioSel, setMunicipioSel] = useState('todos')
   const [seccionSel, setSeccionSel] = useState('todas')
+  const [municipiosDisponibles, setMunicipiosDisponibles] = useState([])
+  
 
   useEffect(() => {
-    async function cargar() {
+    async function cargarNoticias() {
       setError(null)
       setEstaCargando(true)
       try {
-        const secc = await listarDocumentos('secciones')
-        setSecciones(secc.filter((s) => s.activa))
-        const { items, cursor: c } = await listarNoticiasPublicadas({ seccionId: seccionSel, municipio: municipioSel, tam: 9 })
+        const { items } = await listarNoticiasPublicadas({ seccionId: seccionSel, municipio: municipioSel, tam: 60 })
         setNoticias(items)
-        setCursor(c)
       } catch (e) {
         setError(`No se pudo cargar el contenido (verifica Firestore). ${e?.message || ''}`.trim())
       } finally {
         setEstaCargando(false)
       }
     }
-    cargar()
+    cargarNoticias()
   }, [seccionSel, municipioSel])
 
-  if (estaCargando)
-    return (
-      <div>
-        <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' } }}>
-          {Array.from({ length: 9 }).map((_, i) => (
-            <Card key={i} sx={{ height: '100%' }}>
-              <Skeleton variant="rectangular" height={160} />
-              <CardContent>
-                <Skeleton width="60%" height={24} />
-                <Skeleton width="90%" height={18} />
-                <Skeleton width="80%" height={18} />
-              </CardContent>
-            </Card>
-          ))}
-        </Box>
-      </div>
-    )
+  // Cargar secciones una sola vez
+  useEffect(() => {
+    let activo = true
+    async function cargarSecciones() {
+      try {
+        const secc = await listarDocumentos('secciones')
+        if (!activo) return
+        setSecciones(secc.filter((s) => s.activa))
+      } catch (e) {
+        // ignorar
+      }
+    }
+    cargarSecciones()
+    return () => { activo = false }
+  }, [])
 
-  const municipiosDisponibles = Array.from(
-    new Set(noticias.map((n) => (n.municipio || '').trim()).filter((m) => m))
-  )
+  // Cargar municipios disponibles desde todas las noticias publicadas (una vez)
+  useEffect(() => {
+    let activo = true
+    async function cargarMunicipios() {
+      try {
+        const todas = await listarDocumentos('noticias')
+        if (!activo) return
+        const publicados = (todas || []).filter((n) => (n.estado || '').toLowerCase() === 'publicado')
+        const unicos = Array.from(
+          new Set(publicados.map((n) => (n.municipio || '').trim()).filter((m) => m))
+        )
+        setMunicipiosDisponibles(unicos)
+      } catch (e) {
+        // ignorar
+      }
+    }
+    cargarMunicipios()
+    return () => { activo = false }
+  }, [])
 
   function filtrarNoticiasPorSeccion(seccionId) {
-    let lista = noticias
-    if (municipioSel !== 'todos') {
-      lista = lista.filter((n) => (n.municipio || '').trim().toLowerCase() === municipioSel.toLowerCase())
-    }
-    if (seccionSel !== 'todas') {
-      lista = lista.filter((n) => n.seccionId === seccionSel)
-    }
-    if (seccionId) {
-      lista = lista.filter((n) => n.seccionId === seccionId)
-    }
-    return lista
+    return noticias.filter((n) => n.seccionId === seccionId)
   }
 
   const hayResultados = secciones.some((s) => filtrarNoticiasPorSeccion(s.id).length > 0)
 
   return (
     <div>
-      {/* Barra de filtros + navegación */}
-      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between', mb: 3 }}>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-          <Select size="small" value={municipioSel} onChange={(e) => setMunicipioSel(e.target.value)}>
-            <MenuItem value="todos">Todos los municipios</MenuItem>
-            {municipiosDisponibles.map((m) => (
-              <MenuItem key={m} value={m}>{m}</MenuItem>
-            ))}
-          </Select>
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+      <div className="barra-filtros">
+        <select value={municipioSel} onChange={(e) => setMunicipioSel(e.target.value)} className="select-simple select-fijo">
+          <option value="todos">Todos los municipios</option>
+          {municipiosDisponibles.map((m) => (
+            <option key={m} value={m}>{m}</option>
+          ))}
+        </select>
+        <div className="chips-filtros">
+          <Chip
+            label="Todas las secciones"
+            size="small"
+            color={seccionSel === 'todas' ? 'primary' : 'default'}
+            onClick={() => setSeccionSel('todas')}
+          />
+          {secciones.map((s) => (
             <Chip
-              label="Todas las secciones"
-              color={seccionSel === 'todas' ? 'primary' : 'default'}
-              onClick={() => setSeccionSel('todas')}
+              key={s.id}
+              label={s.nombre}
+              size="small"
+              color={seccionSel === s.id ? 'primary' : 'default'}
+              onClick={() => setSeccionSel(s.id)}
             />
-            {secciones.map((s) => (
-              <Chip
-                key={s.id}
-                label={s.nombre}
-                color={seccionSel === s.id ? 'primary' : 'default'}
-                onClick={() => setSeccionSel(s.id)}
-              />
-            ))}
-          </Box>
-        </Box>
-      </Box>
+          ))}
+        </div>
+      </div>
 
       {error && <p style={{ color: 'crimson' }}>{error}</p>}
 
-      {secciones.length === 0 ? (
-        <p>No hay secciones activas.</p>
-      ) : !hayResultados ? (
-        <p>No hay noticias para los filtros seleccionados.</p>
-      ) : (
-        secciones.map((s) => {
+      <div className="resultados-contenedor">
+        {estaCargando ? (
+          <div className="grid-tarjetas">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className="skeleton-card">
+                <div className="tarjeta-cabecera-vacia" />
+                <div className="mt-2">
+                  <div className="skeleton-bar alta" />
+                  <div className="skeleton-bar media" />
+                  <div className="skeleton-bar baja" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : secciones.length === 0 ? (
+          <p>No hay secciones activas.</p>
+        ) : !hayResultados ? (
+          <p>No hay noticias para mostrar.</p>
+        ) : (
+          secciones.map((s) => {
           const deSeccion = filtrarNoticiasPorSeccion(s.id)
           if (deSeccion.length === 0) return null
+          const listaMostrar = seccionSel === 'todas' ? deSeccion.slice(0, 3) : deSeccion
           return (
-            <section key={s.id} style={{ marginBottom: 24 }}>
+            <section key={s.id} className="mb-6">
               <h2>{s.nombre}</h2>
-              <Grid container spacing={2}>
-                {deSeccion.map((n) => (
-                  <Grid key={n.id} size={{ xs: 12, sm: 6, md: 4 }}>
-                    <Card sx={{ height: '100%' }}>
-                      {n.imagenUrl ? (
-                        <CardMedia component="img" height="160" image={n.imagenUrl} alt={n.titulo} loading="lazy" />
-                      ) : (
-                        <Box sx={{ height: 160, bgcolor: 'secondary.main' }} />
-                      )}
-                      <CardContent>
-                        <Chip label={s.nombre} size="small" sx={{ mb: 1 }} color="primary" />
-                        {n.municipio && <Chip label={n.municipio} size="small" sx={{ mb: 1, ml: 1 }} />}
-                        <h3 style={{ margin: '4px 0 8px' }}>
-                          <Link to={`/noticia/${n.id}`}>{n.titulo}</Link>
-                        </h3>
-                        {n.subtitulo && <p style={{ margin: 0, color: '#4B5563' }}>{n.subtitulo}</p>}
-                        <p style={{ marginTop: 8, fontSize: 12, color: '#6B7280' }}>
-                          {`Por ${n.autorNombre || 'Autor desconocido'}`}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </Grid>
+              <div className="grid-tarjetas">
+                {listaMostrar.map((n) => (
+                  <div key={n.id} className="tarjeta overflow-oculto">
+                    {n.imagenUrl ? (
+                      <img src={n.imagenUrl} alt={n.titulo} loading="lazy" className="tarjeta-cabecera-img" />
+                    ) : (
+                      <div className="tarjeta-cabecera-vacia" />
+                    )}
+                    <div className="mt-2">
+                      <Chip label={s.nombre} size="small" sx={{ mb: 1 }} color="primary" />
+                      {n.municipio && <Chip label={n.municipio} size="small" sx={{ mb: 1, ml: 1 }} />}
+                      <h3 className="mt-1 mb-2">
+                        <Link to={`/noticia/${n.id}`}>{n.titulo}</Link>
+                      </h3>
+                      {n.subtitulo && <p className="m-0 texto-secundario">{n.subtitulo}</p>}
+                      <p className="mt-2 texto-pequenio texto-secundario">
+                        {`Por ${n.autorNombre || 'Autor desconocido'}`}
+                      </p>
+                    </div>
+                  </div>
                 ))}
-              </Grid>
+              </div>
+              {seccionSel === 'todas' && deSeccion.length > 3 && (
+                <div className="mt-2" style={{ display: 'flex', justifyContent: 'center' }}>
+                  <Button variant="outlined" onClick={() => setSeccionSel(s.id)}>Ver más</Button>
+                </div>
+              )}
             </section>
           )
-        })
-      )}
-      {cursor && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-          <Button
-            variant="outlined"
-            disabled={cargandoMas}
-            onClick={async () => {
-              try {
-                setCargandoMas(true)
-                const { items, cursor: c } = await listarNoticiasPublicadas({ seccionId: seccionSel, municipio: municipioSel, tam: 9, cursor })
-                setNoticias((prev) => [...prev, ...items])
-                setCursor(c)
-              } catch (e) {
-                setError(`No se pudo cargar más noticias. ${e?.message || ''}`.trim())
-              } finally {
-                setCargandoMas(false)
-              }
-            }}
-          >
-            {cargandoMas ? 'Cargando...' : 'Cargar más'}
-          </Button>
-        </Box>
-      )}
+          })
+        )}
+      </div>
     </div>
   )
 }
+

@@ -14,19 +14,16 @@ export function ProveedorUsuario({ children }) {
     let unsubRol = null
     const unsubAuth = observarAuth(async (usuario) => {
       setUsuarioActual(usuario)
-      // limpiar suscripción previa
       if (unsubRol) {
         unsubRol()
         unsubRol = null
       }
       if (usuario) {
-        // Suscribirse al documento de usuario para rol en tiempo real
         unsubRol = onSnapshot(doc(db, 'usuarios', usuario.uid), (snap) => {
           const rolActual = snap.exists() ? snap.data().rol || 'reportero' : 'reportero'
           setRol(rolActual)
           setEstaCargando(false)
         }, () => {
-          // fallback si falla la suscripción: leer una vez
           obtenerRolUsuario(usuario.uid).then((r) => setRol(r)).finally(() => setEstaCargando(false))
         })
       } else {

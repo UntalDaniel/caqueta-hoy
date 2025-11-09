@@ -3,7 +3,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { crearDocumento, actualizarDocumento, leerDocumento, listarDocumentos, subirArchivo } from '../servicios/firebase'
 import { useUsuario } from '../contexto/UsuarioContexto'
 import { ESTADOS_NOTICIA, ROLES } from '../servicios/modelos'
-import { Paper, Stack, TextField, Button, Typography, Select, MenuItem, InputLabel, FormControl } from '@mui/material'
+import { TextField, Button } from '@mui/material'
 
 export default function NoticiaFormulario() {
   const { usuarioActual, rol } = useUsuario()
@@ -13,9 +13,9 @@ export default function NoticiaFormulario() {
   const esEdicion = Boolean(params.id)
 
   const [secciones, setSecciones] = useState([])
-  const [estaCargando, setEstaCargando] = useState(esEdicion)
+  const [cargando, setCargando] = useState(esEdicion)
   const [error, setError] = useState(null)
-  const [valores, setValores] = useState({
+  const [datosNoticia, setDatosNoticia] = useState({
     titulo: '',
     subtitulo: '',
     municipio: '',
@@ -42,7 +42,7 @@ export default function NoticiaFormulario() {
       try {
         const existente = await leerDocumento('noticias', params.id)
         if (existente) {
-          setValores({
+          setDatosNoticia({
             titulo: existente.titulo || '',
             subtitulo: existente.subtitulo || '',
             municipio: existente.municipio || '',
@@ -55,13 +55,12 @@ export default function NoticiaFormulario() {
       } catch (e) {
         setError('No se pudo cargar la noticia')
       } finally {
-        setEstaCargando(false)
+        setCargando(false)
       }
     }
     if (esEdicion) cargarNoticia()
   }, [esEdicion, params.id])
 
-  // Prefill desde denuncia anónima aceptada: usa state o intenta leer el doc si hay permiso
   useEffect(() => {
     if (esEdicion) return
     const search = new URLSearchParams(location.search)
@@ -72,7 +71,7 @@ export default function NoticiaFormulario() {
         if (anonimaId) {
           const anon = await leerDocumento('anonimas', anonimaId)
           if (anon) {
-            setValores((prev) => ({
+            setDatosNoticia((prev) => ({
               ...prev,
               contenido: anon.texto || prev.contenido,
               imagenUrl: anon.evidenciaUrl || prev.imagenUrl,
@@ -84,7 +83,7 @@ export default function NoticiaFormulario() {
         // Si no hay permiso para leer, hacemos fallback al prefill del state
       }
       if (prefill) {
-        setValores((prev) => ({
+        setDatosNoticia((prev) => ({
           ...prev,
           contenido: prefill.contenido || prev.contenido,
           imagenUrl: prefill.imagenUrl || prev.imagenUrl,
@@ -92,12 +91,11 @@ export default function NoticiaFormulario() {
       }
     }
     intentarPrefill()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search])
 
   function manejarCambio(e) {
     const { name, value } = e.target
-    setValores((prev) => ({ ...prev, [name]: value }))
+    setDatosNoticia((prev) => ({ ...prev, [name]: value }))
   }
 
   async function manejarArchivo(e) {
@@ -106,7 +104,7 @@ export default function NoticiaFormulario() {
     try {
       const ruta = `noticias/${usuarioActual.uid}/${Date.now()}_${archivo.name}`
       const url = await subirArchivo(ruta, archivo)
-      setValores((prev) => ({ ...prev, imagenUrl: url }))
+      setDatosNoticia((prev) => ({ ...prev, imagenUrl: url }))
     } catch (err) {
       alert('No se pudo subir la imagen')
     }
@@ -116,12 +114,12 @@ export default function NoticiaFormulario() {
     e.preventDefault()
     setError(null)
     try {
-      if (!valores.titulo || !valores.seccionId) {
-        setError('Título y Sección son obligatorios')
+      if (!datosNoticia.titulo || !datosNoticia.seccionId || !datosNoticia.municipio) {
+        setError('Título, Sección y Municipio son obligatorios')
         return
       }
       const datos = {
-        ...valores,
+        ...datosNoticia,
         autorUid: usuarioActual?.uid || '',
         autorNombre: usuarioActual?.displayName || usuarioActual?.email || '',
       }
@@ -141,18 +139,16 @@ export default function NoticiaFormulario() {
     ? [ESTADOS_NOTICIA.edicion, ESTADOS_NOTICIA.terminado, ESTADOS_NOTICIA.publicado, ESTADOS_NOTICIA.desactivado]
     : [ESTADOS_NOTICIA.edicion, ESTADOS_NOTICIA.terminado]
 
-  if (estaCargando) return <p>Cargando...</p>
+  if (cargando) return <p>Cargando...</p>
 
   return (
-    <Paper sx={{ maxWidth: 720, p: 2 }}>
-      <Typography variant="h5" component="h1" gutterBottom>
-        {esEdicion ? 'Editar noticia' : 'Nueva noticia'}
-      </Typography>
-      <Stack component="form" spacing={2} onSubmit={manejarEnviar}>
+    <div className="contenedor-medio">
+      <h1 className="mt-0">{esEdicion ? 'Editar noticia' : 'Nueva noticia'}</h1>
+      <form onSubmit={manejarEnviar} className="form-grid">
         <TextField
           label="Título"
           name="titulo"
-          value={valores.titulo}
+          value={datosNoticia.titulo}
           onChange={manejarCambio}
           required
           placeholder="Título de la noticia"
@@ -160,74 +156,84 @@ export default function NoticiaFormulario() {
         <TextField
           label="Subtítulo"
           name="subtitulo"
-          value={valores.subtitulo}
+          value={datosNoticia.subtitulo}
           onChange={manejarCambio}
           placeholder="Subtítulo o bajante"
         />
-        <TextField
-          label="Municipio / ubicación"
-          name="municipio"
-          value={valores.municipio}
-          onChange={manejarCambio}
-          placeholder="Ej: Florencia, San Vicente del Caguán"
-        />
+        <div>
+          <p className="m-0 mb-2">Municipio</p>
+          <select
+            name="municipio"
+            value={datosNoticia.municipio}
+            onChange={manejarCambio}
+            className="select-simple w-100"
+          required
+          >
+            <option value="">Seleccione un municipio</option>
+            <option value="CAQUETÁ">CAQUETÁ</option>
+            <option value="FLORENCIA">FLORENCIA</option>
+            <option value="ALBANIA">ALBANIA</option>
+            <option value="BELEN DE LOS ANDAQUIES">BELEN DE LOS ANDAQUIES</option>
+            <option value="CARTAGENA DEL CHAIRA">CARTAGENA DEL CHAIRA</option>
+            <option value="CURRILLO">CURRILLO</option>
+            <option value="EL DONCELLO">EL DONCELLO</option>
+            <option value="EL PAUJIL">EL PAUJIL</option>
+            <option value="LA MONTAÑITA">LA MONTAÑITA</option>
+            <option value="MILAN">MILAN</option>
+            <option value="MORELIA">MORELIA</option>
+            <option value="PUERTO RICO">PUERTO RICO</option>
+            <option value="SAN JOSE DEL FRAGUA">SAN JOSE DEL FRAGUA</option>
+            <option value="SAN VICENTE DEL CAGUAN">SAN VICENTE DEL CAGUAN</option>
+            <option value="SOLANO">SOLANO</option>
+            <option value="SOLITA">SOLITA</option>
+            <option value="VALPARAISO">VALPARAISO</option>
+          </select>
+        </div>
         <TextField
           label="Contenido"
           name="contenido"
-          value={valores.contenido}
+          value={datosNoticia.contenido}
           onChange={manejarCambio}
           multiline
           minRows={6}
           placeholder="Escribe el contenido aquí..."
           required
         />
-        <FormControl>
-          <InputLabel id="seccion-label">Categoría</InputLabel>
-          <Select
-            labelId="seccion-label"
-            label="Categoría"
-            name="seccionId"
-            value={valores.seccionId}
-            onChange={manejarCambio}
-            required
-          >
-            {secciones.map((s) => (
-              <MenuItem key={s.id} value={s.id}>{s.nombre}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
         <div>
-          <Typography variant="body2" sx={{ mb: 1 }}>Imagen (opcional)</Typography>
+          <p className="m-0 mb-2">Categoría</p>
+          <select name="seccionId" value={datosNoticia.seccionId} onChange={manejarCambio} required className="select-simple w-100">
+            <option value="" disabled>Elige una categoría</option>
+            {secciones.map((s) => (
+              <option key={s.id} value={s.id}>{s.nombre}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <p className="m-0 mb-2">Imagen (opcional)</p>
           <Button variant="outlined" component="label">
             Subir imagen
             <input hidden type="file" accept="image/*" onChange={manejarArchivo} />
           </Button>
-          {valores.imagenUrl && (
-            <div style={{ marginTop: 8 }}>
-              <img src={valores.imagenUrl} alt="Imagen subida" style={{ maxWidth: 240, height: 'auto' }} />
+          {datosNoticia.imagenUrl && (
+            <div className="mt-2">
+              <img src={datosNoticia.imagenUrl} alt="Imagen subida" className="img-240" />
             </div>
           )}
         </div>
-        <FormControl>
-          <InputLabel id="estado-label">Estado</InputLabel>
-          <Select
-            labelId="estado-label"
-            label="Estado"
-            name="estado"
-            value={valores.estado}
-            onChange={manejarCambio}
-          >
+        <div>
+          <p className="m-0 mb-2">Estado</p>
+          <select name="estado" value={datosNoticia.estado} onChange={manejarCambio} className="select-simple w-100">
             {opcionesEstado.map((e) => (
-              <MenuItem key={e} value={e}>{e}</MenuItem>
+              <option key={e} value={e}>{e}</option>
             ))}
-          </Select>
-        </FormControl>
-        {error && <Typography color="error">{error}</Typography>}
-        <Stack direction="row" spacing={1}>
+          </select>
+        </div>
+        {error && <p style={{ color: 'crimson' }}>{error}</p>}
+        <div className="acciones-linea">
           <Button type="submit" variant="contained">{esEdicion ? 'Guardar cambios' : 'Crear noticia'}</Button>
           <Button type="button" variant="outlined" onClick={() => navegar('/panel/noticias')}>Cancelar</Button>
-        </Stack>
-      </Stack>
-    </Paper>
+        </div>
+      </form>
+    </div>
   )
 }

@@ -1,4 +1,3 @@
-import { AppBar, Toolbar, Typography, Container, Box, Button } from '@mui/material'
 import { Link, Routes, Route } from 'react-router-dom'
 import Inicio from './paginas/Inicio'
 import DetalleNoticia from './paginas/DetalleNoticia'
@@ -17,13 +16,14 @@ import Footer from './Components/Footer/Footer'
 import { ROLES } from './servicios/modelos'
 import AnonimasModeracion from './paginas/AnonimasModeracion'
 import AnonimasAceptadas from './paginas/AnonimasAceptadas'
+import './App.css'
 
 function App() {
   const { usuarioActual, salir } = useUsuario()
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', color: 'text.primary' }}>
+    <div className="contenedor-principal">
       <Header />
-      <Container sx={{ py: 3 }}>
+      <main className="area-principal contenedor-centro">
         <Routes>
           <Route path="/" element={<Inicio />} />
           <Route path="/noticia/:id" element={<DetalleNoticia />} />
@@ -121,11 +121,12 @@ function App() {
             }
           />
         </Routes>
-      </Container>
+      </main>
 
       <Footer />
-    </Box>
+    </div>
   )
 }
 
 export default App
+

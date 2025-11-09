@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { crearDocumento, actualizarDocumento, leerDocumento } from '../servicios/firebase'
-import { Paper, Stack, TextField, Button, FormControlLabel, Checkbox, Typography } from '@mui/material'
+import { TextField, Button } from '@mui/material'
 
 export default function SeccionFormulario() {
   const params = useParams()
@@ -55,11 +55,9 @@ export default function SeccionFormulario() {
   if (estaCargando) return <p>Cargando...</p>
 
   return (
-    <Paper sx={{ maxWidth: 520, p: 2 }}>
-      <Typography variant="h5" component="h1" gutterBottom>
-        {esEdicion ? 'Editar sección' : 'Nueva sección'}
-      </Typography>
-      <Stack component="form" spacing={2} onSubmit={manejarEnviar}>
+    <div className="contenedor-pequenio">
+      <h1 className="mt-0">{esEdicion ? 'Editar sección' : 'Nueva sección'}</h1>
+      <form onSubmit={manejarEnviar} className="form-grid">
         <TextField
           label="Nombre"
           name="nombre"
@@ -76,20 +74,20 @@ export default function SeccionFormulario() {
           required
           placeholder="ej. deportes"
         />
-        <FormControlLabel
-          control={<Checkbox checked={valores.activa} name="activa" onChange={manejarCambio} />}
-          label="Activa"
-        />
-        {error && <Typography color="error">{error}</Typography>}
-        <Stack direction="row" spacing={1}>
+        <label className="fila">
+          <input type="checkbox" name="activa" checked={valores.activa} onChange={manejarCambio} />
+          Activa
+        </label>
+        {error && <p style={{ color: 'crimson' }}>{error}</p>}
+        <div className="acciones-linea">
           <Button type="submit" variant="contained" color="primary">
             {esEdicion ? 'Guardar cambios' : 'Crear sección'}
           </Button>
           <Button type="button" variant="outlined" onClick={() => navegar('/panel/secciones')}>
             Cancelar
           </Button>
-        </Stack>
-      </Stack>
-    </Paper>
+        </div>
+      </form>
+    </div>
   )
 }

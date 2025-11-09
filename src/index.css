@@ -1,5 +1,5 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -28,6 +28,9 @@ body {
   min-height: 100vh;
 }
 
+/* Evitar reflujo horizontal por aparición de scrollbar */
+html { scrollbar-gutter: stable; }
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
@@ -51,4 +54,183 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+/* Utilidades de layout y estilos comunes */
+.contenedor-centro {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 12px;
+}
+
+.contenedor-medio {
+  max-width: 720px;
+  padding: 16px;
+  margin: 0 auto;
+}
+
+.contenedor-pequenio {
+  max-width: 520px;
+  padding: 16px;
+  margin: 0 auto;
+}
+
+.centrado-carga {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fila-espaciada {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* estilos de barra de filtros eliminados */
+/* Barra de filtros (centrada, 2 filas como máximo, estable) */
+.barra-filtros {
+  display: flex;
+  flex-wrap: wrap; /* permite dos filas: select + chips */
+  gap: 12px;
+  align-items: center;
+  justify-content: center; /* centrar primera fila */
+  align-content: center;   /* centrar segunda fila */
+  margin-bottom: 12px;
+  min-height: 84px; /* reserva vertical para evitar saltos */
+}
+
+.select-fijo { width: 220px; }
+@media (max-width: 640px) { .select-fijo { width: 180px; } }
+
+/* Los chips ocupan la segunda fila completa, centrados, y mantienen altura */
+.chips-filtros {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center; /* centrar chips */
+  flex-wrap: wrap;         /* permitir varias líneas sin saltos bruscos */
+  flex: 1 1 100%;          /* ocupar toda la segunda fila */
+  min-height: 40px;        /* altura estable al alternar estados */
+}
+
+.chips-filtros .MuiChip-root { height: 28px; box-sizing: border-box; }
+.chips-filtros .MuiChip-label { padding-left: 8px; padding-right: 8px; }
+
+.grid-tarjetas {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+/* Responsividad de grillas */
+@media (min-width: 768px) {
+  .grid-tarjetas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-tarjetas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.tarjeta {
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.tarjeta-cabecera-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+
+.tarjeta-cabecera-vacia {
+  height: 160px;
+  background: #e5e7eb;
+}
+
+.bloque {
+  display: grid;
+  gap: 8px;
+}
+
+.m-0 { margin: 0; }
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 4px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+.mb-1 { margin-bottom: 4px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+.mb-6 { margin-bottom: 24px; }
+
+.texto-pequenio { font-size: 12px; }
+.texto-secundario { color: #6B7280; }
+
+.select-simple {
+  padding: 8px;
+}
+
+.img-max-300 { max-width: 300px; height: auto; }
+.img-responsiva { max-width: 100%; height: auto; display: block; }
+.img-240 { max-width: 240px; height: auto; }
+
+.form-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.acciones-linea {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.resultados-contenedor { min-height: 60vh; }
+.wrap { flex-wrap: wrap; }
+.overflow-oculto { overflow: hidden; }
+.pre-wrap { white-space: pre-wrap; }
+.w-100 { width: 100%; }
+
+.centrar-h {
+  display: flex;
+  justify-content: center;
+}
+
+.columna-flex {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-crecer { flex-grow: 1; }
+
+.titulo-pequenio { font-size: 20px; }
+.h-100 { height: 100%; }
+
+.skeleton-card {
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.skeleton-bar { background: #E5E7EB; border-radius: 4px; }
+.skeleton-bar.alta { height: 24px; width: 60%; margin-bottom: 6px; }
+.skeleton-bar.media { height: 18px; width: 90%; margin-bottom: 6px; }
+.skeleton-bar.baja { height: 18px; width: 80%; }
 
