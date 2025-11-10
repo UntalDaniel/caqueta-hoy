@@ -5,11 +5,13 @@ import { Button } from '@mui/material'
 import { slugify } from '../servicios/slug'
 
 export default function SeccionesLista() {
+  // estados básicos
   const [secciones, setSecciones] = useState([])
   const [estaCargando, setEstaCargando] = useState(true)
   const [error, setError] = useState(null)
   const navegar = useNavigate()
 
+  // traigo todas las secciones
   async function cargar() {
     setError(null)
     try {
@@ -26,6 +28,7 @@ export default function SeccionesLista() {
     cargar()
   }, [])
 
+  // eliminar una sección
   async function eliminarSeccion(id) {
     const ok = confirm('¿Eliminar esta sección?')
     if (!ok) return
@@ -58,6 +61,7 @@ export default function SeccionesLista() {
               <h3 className="mt-0">{s.nombre}</h3>
               <p className="m-0 texto-pequenio texto-secundario">Slug: {s.slug || slugify(s.nombre || '')}</p>
               <p className="m-0 texto-pequenio texto-secundario">Activa: {String(s.activa)}</p>
+              {/* acciones: editar, eliminar y ver pública */}
               <div className="acciones-linea mt-2">
                 <Button size="small" onClick={() => navegar(`/panel/secciones/${s.id}`)}>Editar</Button>
                 <Button size="small" color="error" onClick={() => eliminarSeccion(s.id)}>Eliminar</Button>

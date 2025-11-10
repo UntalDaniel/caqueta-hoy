@@ -7,6 +7,7 @@ import { Chip, Button } from '@mui/material'
 
 export default function Inicio() {
   const navegar = useNavigate()
+  // estados para filtros, datos y carrusel
   const [secciones, setSecciones] = useState([])
   const [noticias, setNoticias] = useState([])
   const [estaCargando, setEstaCargando] = useState(true)
@@ -21,6 +22,7 @@ export default function Inicio() {
   
 
   useEffect(() => {
+    // cargo noticias según filtros seleccionados
     async function cargarNoticias() {
       setError(null)
       setEstaCargando(true)
@@ -92,6 +94,7 @@ export default function Inicio() {
 
   const hayResultados = secciones.some((s) => filtrarNoticiasPorSeccion(s.id).length > 0)
 
+  // parseo el id del video de YouTube desde distintas URLs
   function extraerIdDeYouTube(url) {
     if (!url) return ''
     try {
@@ -110,6 +113,7 @@ export default function Inicio() {
     }
   }
 
+  // gestos de swipe: inicio del toque
   function alTocarInicio(e) {
     if (!videos.length) return
     const t = e.touches && e.touches[0]
@@ -118,6 +122,7 @@ export default function Inicio() {
     setDesplazamientoToque(0)
   }
 
+  // gestos de swipe: mover
   function alMoverToque(e) {
     if (!toqueInicio) return
     const t = e.touches && e.touches[0]
@@ -130,6 +135,7 @@ export default function Inicio() {
     }
   }
 
+  // gestos de swipe: terminar y cambiar de video
   function alTerminarToque() {
     if (!toqueInicio) return
     const umbral = 40

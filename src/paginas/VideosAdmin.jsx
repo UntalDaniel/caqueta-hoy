@@ -3,6 +3,7 @@ import { Button, TextField, Checkbox, FormControlLabel } from '@mui/material'
 import { listarDocumentos, crearDocumento, eliminarDocumento, actualizarDocumento } from '../servicios/firebase'
 
 export default function VideosAdmin() {
+  // estados del admin de videos
   const [videos, setVideos] = useState([])
   const [url, setUrl] = useState('')
   const [titulo, setTitulo] = useState('')
@@ -25,6 +26,7 @@ export default function VideosAdmin() {
     }
   }
 
+  // saca el id del video para embeberlo en el home
   function extraerIdDeYouTube(url) {
     if (!url) return ''
     try {
@@ -45,6 +47,7 @@ export default function VideosAdmin() {
 
   useEffect(() => { cargar() }, [])
 
+  // agrega un video nuevo (valida la URL)
   async function agregar(e) {
     e.preventDefault()
     if (!url.trim()) return
@@ -65,6 +68,7 @@ export default function VideosAdmin() {
     }
   }
 
+  // elimina un video de la lista
   async function eliminar(id) {
     const ok = confirm('¿Eliminar este video?')
     if (!ok) return
@@ -76,6 +80,7 @@ export default function VideosAdmin() {
     }
   }
 
+  // activa/desactiva el video para mostrarlo en Inicio
   async function alternarActivo(v) {
     try {
       await actualizarDocumento('videos', v.id, { activo: !v.activo })
@@ -88,6 +93,7 @@ export default function VideosAdmin() {
   return (
     <div>
       <h1>Videos (YouTube)</h1>
+      {/* formulario simple para agregar links */}
       <form onSubmit={agregar} className="mb-3" style={{ display: 'grid', gap: '0.5rem', maxWidth: 600 }}>
         <TextField label="URL de YouTube" size="small" value={url} onChange={(e) => setUrl(e.target.value)} required />
         <TextField label="Título (opcional)" size="small" value={titulo} onChange={(e) => setTitulo(e.target.value)} />

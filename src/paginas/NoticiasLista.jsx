@@ -8,12 +8,14 @@ import { ROLES, ESTADOS_NOTICIA } from '../servicios/modelos'
 
 export default function NoticiasLista() {
   const { usuarioActual, rol } = useUsuario()
+  // estados para lista, carga y errores
   const [noticias, setNoticias] = useState([])
   const [estaCargando, setEstaCargando] = useState(true)
   const [error, setError] = useState(null)
   const [secciones, setSecciones] = useState([])
   const navegar = useNavigate()
 
+  // cargo noticias y secciones
   async function cargar() {
     setError(null)
     try {
@@ -22,6 +24,7 @@ export default function NoticiasLista() {
         listarDocumentos('secciones'),
       ])
       setSecciones(secc)
+      // si no es editor/admin, solo muestro mis noticias
       const esGestor = rol === ROLES.editor || rol === ROLES.administrador
       const filtradas = esGestor ? todas : todas.filter((n) => n.autorUid === usuarioActual?.uid)
       filtradas.sort((a, b) => (b.fechaCreacion?.seconds || 0) - (a.fechaCreacion?.seconds || 0))
@@ -38,6 +41,7 @@ export default function NoticiasLista() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usuarioActual, rol])
 
+  // eliminar una noticia por id
   async function eliminarNoticia(id) {
     const ok = confirm('¿Eliminar esta noticia?')
     if (!ok) return
@@ -49,6 +53,7 @@ export default function NoticiasLista() {
     }
   }
 
+  // cambiar estado (solo para editor/admin)
   async function cambiarEstado(noticia, nuevoEstado) {
     try {
       await actualizarDocumento('noticias', noticia.id, { estado: nuevoEstado })
@@ -58,6 +63,7 @@ export default function NoticiasLista() {
     }
   }
 
+  // buscar el slug de la sección para armar el link público
   function obtenerSlugSeccion(seccionId) {
     const s = secciones.find((x) => x.id === seccionId)
     if (!s) return ''

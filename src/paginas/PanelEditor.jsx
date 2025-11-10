@@ -7,9 +7,11 @@ import { listarDocumentos, listarAnonimas } from '../servicios/firebase'
 export default function PanelEditor() {
   const navegar = useNavigate()
   const { usuarioActual } = useUsuario()
+  // totales que ve el editor
   const [contadores, setContadores] = useState({ anonimasAceptadas: 0, noticias: 0, secciones: 0 })
 
   useEffect(() => {
+    // cargo conteos básicos para el panel
     async function cargar() {
       try {
         const [anon, noti, sec] = await Promise.all([
@@ -36,6 +38,7 @@ export default function PanelEditor() {
         <p className="m-0 texto-secundario">Gestiona publicaciones y desarrolla anónimas aceptadas.</p>
         <p className="m-0">Bienvenido: <strong>{usuarioActual?.displayName || usuarioActual?.email}</strong></p>
       </header>
+      {/* accesos rápidos para el editor */}
       <div className="grid-tarjetas">
         <div className="tarjeta">
           <h3 className="mt-0">📥 Anónimas aceptadas</h3>

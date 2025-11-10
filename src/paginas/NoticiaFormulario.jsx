@@ -13,6 +13,7 @@ export default function NoticiaFormulario() {
   const navegar = useNavigate()
   const esEdicion = Boolean(parametros.id)
 
+  // estados del formulario
   const [secciones, setSecciones] = useState([])
   const [cargando, setCargando] = useState(esEdicion)
   const [error, setError] = useState(null)
@@ -27,6 +28,7 @@ export default function NoticiaFormulario() {
   })
 
   useEffect(() => {
+    // cargo secciones activas para el select
     async function cargarSecciones() {
       try {
         const lista = await listarDocumentos('secciones')
@@ -45,6 +47,7 @@ export default function NoticiaFormulario() {
   }
 
   useEffect(() => {
+    // si es edición, leo la noticia y lleno el form
     async function cargarNoticia() {
       try {
         const existente = await leerDocumento('noticias', parametros.id)
@@ -69,6 +72,7 @@ export default function NoticiaFormulario() {
   }, [esEdicion, parametros.id])
 
   useEffect(() => {
+    // si vengo desde una anónima, intento prellenar
     if (esEdicion) return
     const search = new URLSearchParams(ubicacion.search)
     const anonimaId = search.get('anonimaId')
@@ -100,11 +104,13 @@ export default function NoticiaFormulario() {
     intentarPrefill()
   }, [ubicacion.search])
 
+  // controlar los inputs de texto/select
   function cambiarCampo(e) {
     const { name, value } = e.target
     setDatosNoticia((prev) => ({ ...prev, [name]: value }))
   }
 
+  // subir imagen a storage y guardar url
   async function subirImagen(e) {
     const archivo = e.target.files?.[0]
     if (!archivo || !usuarioActual) return
@@ -117,6 +123,7 @@ export default function NoticiaFormulario() {
     }
   }
 
+  // crear o actualizar según si es edición
   async function enviarFormulario(e) {
     e.preventDefault()
     setError(null)

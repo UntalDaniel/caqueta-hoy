@@ -7,9 +7,11 @@ import { listarAnonimas, listarNoticiasPorAutor } from '../servicios/firebase'
 export default function PanelReportero() {
   const navegar = useNavigate()
   const { usuarioActual } = useUsuario()
+  // conteos básicos que ve el reportero
   const [contadores, setContadores] = useState({ anonimasAceptadas: 0, misNoticias: 0 })
 
   useEffect(() => {
+    // cuando tengo el usuario, cargo sus datos
     async function cargar() {
       try {
         const uid = usuarioActual?.uid || ''
@@ -35,6 +37,7 @@ export default function PanelReportero() {
         <p className="m-0 texto-secundario">Crea y administra tus noticias. Desarrolla anónimas aceptadas.</p>
         <p className="m-0">Bienvenido: <strong>{usuarioActual?.displayName || usuarioActual?.email}</strong></p>
       </header>
+      {/* accesos tarjetas */}
       <div className="grid-tarjetas">
         <div className="tarjeta">
           <h3 className="mt-0">📥 Anónimas aceptadas</h3>

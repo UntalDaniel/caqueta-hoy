@@ -24,11 +24,14 @@ function App() {
     <div className="contenedor-principal">
       <Header />
       <main className="area-principal contenedor-centro">
+        {/* Rutas públicas y del panel */}
         <Routes>
           <Route path="/" element={<Inicio />} />
+          {/* Sección y detalle público */}
           <Route path="/secciones/:slug" element={<SeccionPagina />} />
           <Route path="/secciones/:slug/:id" element={<DetalleNoticia />} />
           <Route path="/ingresar" element={<Ingresar />} />
+          {/* Panel privado (requiere login) */}
           <Route
             path="/panel"
             element={
@@ -37,6 +40,7 @@ function App() {
               </RutaPrivada>
             }
           />
+          {/* Secciones para editor/admin */}
           <Route
             path="/panel/secciones"
             element={
@@ -67,6 +71,7 @@ function App() {
               </RutaPrivada>
             }
           />
+          {/* Noticias del panel (reportero puede crear/editar) */}
           <Route
             path="/panel/noticias"
             element={
@@ -91,6 +96,7 @@ function App() {
               </RutaPrivada>
             }
           />
+          {/* Gestión de usuarios (solo admin) */}
           <Route
             path="/panel/usuarios"
             element={
@@ -101,6 +107,7 @@ function App() {
               </RutaPrivada>
             }
           />
+          {/* Moderación de anónimas (solo admin) */}
           <Route
             path="/panel/anonimas"
             element={
@@ -111,6 +118,7 @@ function App() {
               </RutaPrivada>
             }
           />
+          {/* Lista de anónimas aceptadas (reportero/editor/admin) */}
           <Route
             path="/panel/anonimas/aceptadas"
             element={
@@ -121,6 +129,7 @@ function App() {
               </RutaPrivada>
             }
           />
+          {/* Gestión de videos del home (solo admin) */}
           <Route
             path="/panel/videos"
             element={

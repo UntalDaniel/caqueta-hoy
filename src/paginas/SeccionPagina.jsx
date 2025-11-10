@@ -6,6 +6,7 @@ import TarjetaNoticia from '../Components/TarjetaNoticia'
 
 export default function SeccionPagina() {
   const { slug } = useParams()
+  // estados para la sección y sus noticias
   const [secciones, setSecciones] = useState([])
   const [seccion, setSeccion] = useState(null)
   const [noticias, setNoticias] = useState([])
@@ -13,6 +14,7 @@ export default function SeccionPagina() {
   const [error, setError] = useState('')
 
   useEffect(() => {
+    // cargo secciones activas
     let activo = true
     async function cargarSecciones() {
       try {
@@ -40,6 +42,7 @@ export default function SeccionPagina() {
   useEffect(() => {
     async function cargar() {
       if (!seccion) return
+      // muestro loader mientras traigo las noticias
       setCargando(true)
       setError('')
       try {
@@ -74,6 +77,7 @@ export default function SeccionPagina() {
       ) : noticias.length === 0 ? (
         <p>No hay noticias en esta sección.</p>
       ) : (
+        // renderizo tarjetas de esta sección
         <div className="grid-tarjetas">
           {noticias.map((n) => (
             <TarjetaNoticia

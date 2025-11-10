@@ -7,9 +7,11 @@ import { listarDocumentos } from '../servicios/firebase'
 export default function PanelAdministrador() {
   const navegar = useNavigate()
   const { usuarioActual } = useUsuario()
+  // contadores del panel admin
   const [contadores, setContadores] = useState({ anonimasPendientes: 0, usuarios: 0, secciones: 0, noticias: 0 })
 
   useEffect(() => {
+    // cargo totales al entrar
     async function cargar() {
       try {
         const [anon, us, sec, noti] = await Promise.all([
@@ -38,6 +40,7 @@ export default function PanelAdministrador() {
         <p className="m-0 texto-secundario">Administra usuarios, secciones y supervisa denuncias y noticias.</p>
         <p className="m-0">Bienvenido: <strong>{usuarioActual?.displayName || usuarioActual?.email}</strong></p>
       </header>
+      {/* tarjetas rápidas para navegar */}
       <div className="grid-tarjetas">
         <div className="tarjeta">
           <h3 className="mt-0">📣 Denuncias anónimas</h3>
