@@ -53,11 +53,11 @@ export default function Footer() {
         <div className="footer-social">
           <p style={{ margin: 0, fontWeight: 600 }}>Síguenos</p>
           <div className="social-links">
-            <a href="https://www.facebook.com/profile.php?id=61566982868031" target="_blank" rel="noreferrer" aria-label="Facebook" title="Facebook">
+            <a href="https://www.facebook.com/profile.php?id=61566982868031" target="_blank" rel="noreferrer" aria-label="Facebook" title="Facebook" data-ver="4">
               <img src={`${import.meta.env.BASE_URL}icons/facebook.svg`} alt="Facebook" width={20} height={20} style={{ verticalAlign: 'middle', marginRight: 6 }} />
               Facebook
             </a>
-            <a href="https://www.instagram.com/ia_asmr_dr/" target="_blank" rel="noreferrer" aria-label="Instagram" title="Instagram">
+            <a href="https://www.instagram.com/ia_asmr_dr/" target="_blank" rel="noreferrer" aria-label="Instagram" title="Instagram" data-ver="4">
               <img src={`${import.meta.env.BASE_URL}icons/instagram.svg`} alt="Instagram" width={20} height={20} style={{ verticalAlign: 'middle', marginRight: 6 }} />
               Instagram
             </a>
